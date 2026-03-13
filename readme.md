@@ -20,16 +20,16 @@
 
 ```bash
 # Через SSH
-pip install git+ssh://git@github.com/yourusername/retryable_http_client.git@v0.1.0
+pip install git+ssh://git@github.com/sidorov-works/http_utils.git@v0.1.0
 
 # Через HTTPS
-pip install git+https://github.com/yourusername/retryable_http_client.git@v0.1.0
+pip install git+https://github.com/sidorov-works/http_utils.git@v0.1.0
 ```
 
 ### Локальная установка для разработки
 
 ```bash
-git clone https://github.com/yourusername/retryable_http_client.git
+git clone https://github.com/sidorov-works/http_utils.git
 cd retryable_http_client
 pip install -e .[dev]
 ```
@@ -40,13 +40,13 @@ pip install -e .[dev]
 ```toml
 [project]
 dependencies = [
-    "http-utils @ git+https://github.com/yourusername/retryable_http_client.git@v0.1.0"
+    "http-utils @ git+https://github.com/sidorov-works/http_utils.git@v0.1.0"
 ]
 ```
 
 В requirements.txt:
 ```
-http-utils @ git+https://github.com/yourusername/retryable_http_client.git@v0.1.0
+http-utils @ git+https://github.com/sidorov-works/http_utils.git@v0.1.0
 ```
 
 ## Быстрый старт
