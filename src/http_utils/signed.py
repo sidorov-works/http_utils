@@ -203,5 +203,5 @@ def create_signed_client(
     base_client.delete_with_retry = signed_delete
     base_client.get_with_retry = signed_get
     
-    logger.info(f"JWT signing enabled for client (service: {service_name})")
+    logger.info(f"{auth_type} signing enabled for client (service: {service_name})")
     return base_client

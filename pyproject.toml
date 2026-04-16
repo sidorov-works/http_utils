@@ -1,6 +1,6 @@
 [project]
 name = "http-utils"
-version = "0.1.0"
+version = "0.1.1"
 description = "Custom retryable http client with automatic authorization support (JWT token, secret header)"
 authors = [{name = "Oleg Sidorov", email = "sidorov.works@yandex.ru"}]
 license = {text = "MIT"}
