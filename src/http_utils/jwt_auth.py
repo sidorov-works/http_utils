@@ -14,6 +14,7 @@ from typing import Optional, Dict, Any, List
 import logging
 logger = logging.getLogger(__name__)
 
+
 def create_jwt_token(
         secret_key: str,
         token_expire_seconds: int = 30,
@@ -23,25 +24,27 @@ def create_jwt_token(
     ) -> str:
     """
     Создает JWT токен для межсервисной аутентификации.
-    
+
     Args:
         secret_key: Секретный ключ для подписи токена. Должен быть известен и клиенту, и серверу.
         token_expire_seconds: Время жизни токена в секундах. По умолчанию 30 секунд.
         algorithm: Алгоритм подписи JWT. По умолчанию "HS256".
         service_name: Идентификатор сервиса-отправителя. Будет добавлен в поля iss и service.
-        extra_payload: Дополнительные данные для включения в токен. 
+        extra_payload: Дополнительные данные для включения в токен.
                       Например: {"request_id": "123", "user_id": 42}. По умолчанию None.
-    
+                      Ключи iss, iat, exp, service игнорируются, если переданы здесь —
+                      системные значения всегда имеют приоритет.
+
     Returns:
         str: JWT токен в формате строки
-    
+
     Example:
         >>> token = create_jwt_token(
         ...     secret_key="my-secret",
         ...     service_name="encoder-client",
         ...     extra_payload={"request_id": "550e8400-e29b-41d4"}
         ... )
-    
+
     Пример payload созданного токена:
         {
             "iss": "encoder-client",          # отправитель
@@ -50,28 +53,26 @@ def create_jwt_token(
             "service": "encoder-client",       # дублируем для удобства
             "request_id": "550e8400-e29b-41d4" # из extra_payload
         }
-    
+
     Note:
         - Токен создается с коротким временем жизни (по умолчанию 30с) для безопасности
         - Всегда используйте HTTPS в production для защиты токена при передаче
         - Алгоритм HS256 требует, чтобы секретный ключ был известен обеим сторонам
     """
     current_time = int(time.time())
-    
-    # Базовый payload
-    payload = {
+
+    # FIX: сначала кладём extra_payload, затем системные claims —
+    # чтобы extra_payload не мог перезаписать iss/iat/exp/service.
+    payload: Dict[str, Any] = dict(extra_payload) if extra_payload else {}
+    payload.update({
         "iss": service_name,                          # кто выпустил токен
         "iat": current_time,                          # когда выпущен
         "exp": current_time + token_expire_seconds,   # когда истекает
         "service": service_name,                      # имя сервиса
-    }
-    
-    # Добавляем дополнительные данные, если есть
-    if extra_payload:
-        payload.update(extra_payload)
-    
+    })
+
     # Создаем подписанный токен
     token = jwt.encode(payload, secret_key, algorithm=algorithm)
-    
+
     logger.debug(f"Created JWT token for {service_name}, expires in {token_expire_seconds}s")
     return token
