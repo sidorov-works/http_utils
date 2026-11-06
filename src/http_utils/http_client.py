@@ -1,9 +1,10 @@
 # http_utils/http_client.py
 
 import httpx
+import ssl
 import asyncio
 import random
-from typing import Dict, Set, Optional
+from typing import Dict, Set, Optional, Union
 
 import logging
 logger = logging.getLogger(__name__)
@@ -35,6 +36,7 @@ class RetryableHTTPClient:
         base_delay (float): Начальная задержка перед первой повторной попыткой (в секундах)
         max_delay (float): Максимальная задержка между повторными попытками (в секундах)
         total_timeout (float, optional): Общее максимальное время выполнения всех попыток
+        verify (Union[bool, str, ssl.SSLContext]): Проверять ли SSL-сертификат сервера
         _client (httpx.AsyncClient, optional): Внутренний HTTP-клиент
     """
 
@@ -44,7 +46,9 @@ class RetryableHTTPClient:
         max_retries: int = 3,
         base_delay: float = 1.0,
         max_delay: float = 30.0,
-        total_timeout: Optional[float] = None
+        total_timeout: Optional[float] = None,
+        *,
+        verify: Union[bool, str, ssl.SSLContext] = True
     ):
         """
         Инициализация HTTP-клиента с повторными попытками.
@@ -67,6 +71,11 @@ class RetryableHTTPClient:
                 включая время ожидания ответов и задержки между попытками.
                 Если None - ограничение не применяется.
                 Если указан, должен быть > 0.
+            verify: Проверять ли SSL-сертификат сервера. По умолчанию True.
+                Может быть bool (True/False), путём к CA-bundle (str)
+                или ssl.SSLContext. Пробрасывается в httpx.AsyncClient(verify=...).
+                Отключать (False) допустимо только для self-signed/staging
+                окружений — в production это создаёт риск MITM.
 
         Raises:
             ValueError: При некорректных значениях параметров
@@ -96,6 +105,7 @@ class RetryableHTTPClient:
         self.base_delay = base_delay
         self.max_delay = max_delay
         self.total_timeout = total_timeout
+        self.verify = verify
         self._client = None
 
     async def _ensure_client(self):
@@ -113,7 +123,8 @@ class RetryableHTTPClient:
             self._client = httpx.AsyncClient(
                 timeout=httpx.Timeout(self.base_timeout),
                 limits=httpx.Limits(max_connections=100, max_keepalive_connections=20),
-                http2=True
+                http2=True,
+                verify=self.verify
             )
 
     def _calculate_delay_with_jitter(self, attempt: int) -> float:

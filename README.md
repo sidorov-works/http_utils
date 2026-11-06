@@ -20,10 +20,10 @@
 
 ```bash
 # Через SSH
-pip install git+ssh://git@github.com/sidorov-works/http_utils.git@v0.1.2
+pip install git+ssh://git@github.com/sidorov-works/http_utils.git@v0.2.0
 
 # Через HTTPS
-pip install git+https://github.com/sidorov-works/http_utils.git@v0.1.2
+pip install git+https://github.com/sidorov-works/http_utils.git@v0.2.0
 ```
 
 ### Локальная установка для разработки
@@ -40,13 +40,13 @@ pip install -e .[dev]
 ```toml
 [project]
 dependencies = [
-    "http-utils @ git+https://github.com/sidorov-works/http_utils.git@v0.1.2"
+    "http-utils @ git+https://github.com/sidorov-works/http_utils.git@v0.2.0"
 ]
 ```
 
 В requirements.txt:
 ```
-http-utils @ git+https://github.com/sidorov-works/http_utils.git@v0.1.2
+http-utils @ git+https://github.com/sidorov-works/http_utils.git@v0.2.0
 ```
 
 ## Быстрый старт

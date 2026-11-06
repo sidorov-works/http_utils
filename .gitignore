@@ -45,3 +45,6 @@ htmlcov/
 
 # OS generated files
 .DS_Store
+
+generate_docs.py
+project_structure.md
